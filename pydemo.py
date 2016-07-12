@@ -7,11 +7,19 @@ from gps import *
 from time import *
 import time
 import threading
+import SimpleHTTPServer, SocketServer
  
 gpsd = None #seting the global variable
  
 os.system('clear') #clear the terminal (optional)
  
+class Server():
+  PORT = 8000;
+  Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+  httpd = SocketServer.TCPServer(("", PORT), Handler)
+  print "serving at port ", PORT
+  httpd.serve_forever()
+
 class GpsPoller(threading.Thread):
   def __init__(self):
     threading.Thread.__init__(self)
@@ -27,8 +35,11 @@ class GpsPoller(threading.Thread):
  
 if __name__ == '__main__':
   gpsp = GpsPoller() # create the thread
+  s = Server() # create server
+
   try:
     gpsp.start() # start it up
+    s.start()
     while True:
       #It may take a second or two to get good data
       #print gpsd.fix.latitude,', ',gpsd.fix.longitude,'  Time: ',gpsd.utc
